@@ -29,17 +29,17 @@ A = matrix(c(.3,0,0,.5,.3,0,.2,.7,1),nrow=3,ncol=3)
 B = matrix(c(1,.5,0,0,.5,1),nrow=3,ncol=2)
 pi = matrix(c(.6,.4,0),nrow=3,ncol=1)
 
-#inicializacao
+################## 1. Cálculo da variável forward alpha ##################
+
+# Inicialização (Equação 6)
 a1 = B[,1] * pi
-a1
 alphas = data.frame()
-i = 1
-a2_1 = sum((a1*retorna_a_pelo_indice_coluna(A,i))) * retorna_b_pelo_indice_linha(B,i)# OK 
-i = 2
-a2_2 = sum((a1*retorna_a_pelo_indice_coluna(A,i))) * retorna_b_pelo_indice_linha(B,i)# OK 
+a2_1 = sum((a1*retorna_a_pelo_indice_coluna(A,1))) * retorna_b_pelo_indice_linha(B,1)
+a2_2 = sum((a1*retorna_a_pelo_indice_coluna(A,2))) * retorna_b_pelo_indice_linha(B,2) 
 alphas = rbind(data.frame(a2_1,a2_1,a2_2))
 colnames(alphas) = c("alpha1","alpha2","alpha3")
 
+# Indução (Equação 7)
 aux_alphas =  data.frame(1)
 j = 1
 for(i in 3:8){
@@ -53,4 +53,23 @@ for(i in 3:8){
     aux_alphas =  data.frame(1)
   }
 }
+
+################### 2. Cálculo de P(O | lambda ) ####################
+# Terminação (Equação 8)
+alphas
+sum(alphas)
+
+
+# 3. Cálculo da variável backward Beta .
+
+
+
+
+
+
+
+
+
+
+
 
