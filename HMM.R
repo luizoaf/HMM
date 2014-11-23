@@ -50,12 +50,12 @@ colnames(alphas) = c("alpha1","alpha2","alpha3")
 # Indução (Equação 7)
 aux_alphas =  data.frame(1)
 j = 1
-for(i in 3:8){
+for(i in ncol(A):8){
   aux_alphas=  cbind(aux_alphas,sum(alphas[nrow(alphas),] *retorna_a_pelo_indice_coluna(A,i)) * retorna_b_pelo_indice_linha(B,i))# OK 
-  if(i%%3 ==0){
+  if(i%%ncol(A) ==0){
     aux_alphas = data.frame(aux_alphas[,-1])
   }
-  if(ncol(aux_alphas)==3){
+  if(ncol(aux_alphas)==ncol(A)){
     alphas = rbind(data.frame( aux_alphas[,1], aux_alphas[,2], aux_alphas[,3]))
     colnames(alphas) = c("alpha1","alpha2","alpha3")
     aux_alphas =  data.frame(1)
@@ -71,7 +71,6 @@ sum(alphas)
 # 3. Cálculo da variável backward Beta .
 
 
-betas =  data.frame(1,1,1)
 
 
 iteracoes = 12
@@ -86,20 +85,17 @@ for(i in 1: iteracoes){
 }
 b_indices_colunas
 
-# b = c(rep(1,iteracoes/ncol(B)),)
-
+betas =  data.frame(1,1,1)
+aux_betas = data.frame()
 for(i in 1:iteracoes){
-  print(retorna_a_pelo_indice_pela_linha(A,i) * B[,b_indices_colunas[i]])
-  #   aux_alphas=  cbind(aux_alphas,sum(alphas[nrow(alphas),] *retorna_a_pelo_indice_coluna(A,i)) * retorna_b_pelo_indice_linha(B,i))# OK 
-  #   if(i%%3 ==0){
-  #     aux_alphas = data.frame(aux_alphas[,-1])
-  #   }
-  #   if(ncol(aux_alphas)==3){
-  #     alphas = rbind(data.frame( aux_alphas[,1], aux_alphas[,2], aux_alphas[,3]))
-  #     colnames(alphas) = c("alpha1","alpha2","alpha3")
-  #     aux_alphas =  data.frame(1)
-  #   }
+  aux_betas = rbind(aux_betas , retorna_a_pelo_indice_pela_linha(A,i) * B[,b_indices_colunas[i]] * betas[nrow(betas),])
+  if(ncol(aux_betas)%%ncol(A)==0){
+    betas = rbind(betas,apply(aux_betas,MARGIN=1,FUN=sum))
+    aux_betas = data.frame()
+    colnames(betas) = c("beta1","beta2","beta3")
+  }
 }
+betas
 
 
 
