@@ -1,3 +1,7 @@
+# Autor: Luiz de Oliveira Alves Filho
+# Disciplina: Probabilidade e Processos Estocásticos
+# Professor: Mêuser
+
 retorna_b_pelo_indice_linha = function(B,indice_b){
   j_linha = 2
   j_coluna = 1
@@ -32,70 +36,73 @@ retorna_a_pelo_indice_pela_linha = function(A,indice_a){
   }
 }
 
+hmm_backward = function(A,B,pi,iteracoes){
+  partes_b = iteracoes/ncol(B)
+  indice_coluna_b = ncol(B)
+  b_indices_colunas = c()
+  for(i in 1: iteracoes){
+    b_indices_colunas[i] = indice_coluna_b 
+    if(i%%partes_b==0){
+      indice_coluna_b = indice_coluna_b - 1
+    }
+  }
+  b_indices_colunas
+  betas =  data.frame(1,1,1)
+  aux_betas = data.frame()
+  for(i in 1:iteracoes){
+    aux_betas = rbind(aux_betas , retorna_a_pelo_indice_pela_linha(A,i) * B[,b_indices_colunas[i]] * betas[nrow(betas),])
+    if(nrow(aux_betas)%%ncol(A)==0){
+      betas = rbind(betas,apply(aux_betas,MARGIN=1,FUN=sum))
+      aux_betas = data.frame()
+      colnames(betas) = c("beta1","beta2","beta3")
+    }
+  }
+  print(betas[nrow(betas)-1,])
+  sum(pi*betas[nrow(betas)-1,]*B[,1])
+}
+
+
+hmm_forward = function(A,B,pi,iteracoes){
+  # Inicialização (Equação 6)
+  a1 = B[,1] * pi
+  alphas = data.frame()
+  a2_1 = sum((a1*retorna_a_pelo_indice_coluna(A,1))) * retorna_b_pelo_indice_linha(B,1)
+  a2_2 = sum((a1*retorna_a_pelo_indice_coluna(A,2))) * retorna_b_pelo_indice_linha(B,2) 
+  alphas = rbind(data.frame(a2_1,a2_1,a2_2))
+  colnames(alphas) = c("alpha1","alpha2","alpha3")
+  #   print(alphas)
+  
+  # Indução (Equação 7)
+  aux_alphas =  data.frame(1)
+  j = 1
+  for(i in ncol(A):iteracoes){
+    aux_alphas=  cbind(aux_alphas,sum(alphas[nrow(alphas),] *retorna_a_pelo_indice_coluna(A,i)) * retorna_b_pelo_indice_linha(B,i))# OK 
+    if(i%%ncol(A) ==0){
+      aux_alphas = data.frame(aux_alphas[,-1])
+    }
+    if(ncol(aux_alphas)==ncol(A)){
+      alphas = rbind(data.frame( aux_alphas[,1], aux_alphas[,2], aux_alphas[,3]))
+      #       print(alphas)
+      colnames(alphas) = c("alpha1","alpha2","alpha3")
+      aux_alphas =  data.frame(1)
+    }
+  }
+  
+  ################### 2. Cálculo de P(O | lambda ) ####################
+  # Terminação (Equação 8)
+    print(alphas)
+  return(sum(alphas))
+}
+
 
 A = matrix(c(.3,0,0,.5,.3,0,.2,.7,1),nrow=3,ncol=3)
 B = matrix(c(1,.5,0,0,.5,1),nrow=3,ncol=2)
 pi = matrix(c(.6,.4,0),nrow=3,ncol=1)
 
-################## 1. Cálculo da variável forward alpha ##################
 
-# Inicialização (Equação 6)
-a1 = B[,1] * pi
-alphas = data.frame()
-a2_1 = sum((a1*retorna_a_pelo_indice_coluna(A,1))) * retorna_b_pelo_indice_linha(B,1)
-a2_2 = sum((a1*retorna_a_pelo_indice_coluna(A,2))) * retorna_b_pelo_indice_linha(B,2) 
-alphas = rbind(data.frame(a2_1,a2_1,a2_2))
-colnames(alphas) = c("alpha1","alpha2","alpha3")
+hmm_forward(A,B,pi,8)
+hmm_backward(A,B,pi,12)
 
-# Indução (Equação 7)
-aux_alphas =  data.frame(1)
-j = 1
-for(i in ncol(A):8){
-  aux_alphas=  cbind(aux_alphas,sum(alphas[nrow(alphas),] *retorna_a_pelo_indice_coluna(A,i)) * retorna_b_pelo_indice_linha(B,i))# OK 
-  if(i%%ncol(A) ==0){
-    aux_alphas = data.frame(aux_alphas[,-1])
-  }
-  if(ncol(aux_alphas)==ncol(A)){
-    alphas = rbind(data.frame( aux_alphas[,1], aux_alphas[,2], aux_alphas[,3]))
-    colnames(alphas) = c("alpha1","alpha2","alpha3")
-    aux_alphas =  data.frame(1)
-  }
-}
-
-################### 2. Cálculo de P(O | lambda ) ####################
-# Terminação (Equação 8)
-alphas
-sum(alphas)
-
-
-# 3. Cálculo da variável backward Beta .
-
-
-
-
-iteracoes = 12
-partes_b = iteracoes/ncol(B)
-indice_coluna_b = ncol(B)
-b_indices_colunas = c()
-for(i in 1: iteracoes){
-  b_indices_colunas[i] = indice_coluna_b 
-  if(i%%partes_b==0){
-    indice_coluna_b = indice_coluna_b - 1
-  }
-}
-b_indices_colunas
-
-betas =  data.frame(1,1,1)
-aux_betas = data.frame()
-for(i in 1:iteracoes){
-  aux_betas = rbind(aux_betas , retorna_a_pelo_indice_pela_linha(A,i) * B[,b_indices_colunas[i]] * betas[nrow(betas),])
-  if(ncol(aux_betas)%%ncol(A)==0){
-    betas = rbind(betas,apply(aux_betas,MARGIN=1,FUN=sum))
-    aux_betas = data.frame()
-    colnames(betas) = c("beta1","beta2","beta3")
-  }
-}
-betas
 
 
 
