@@ -24,6 +24,14 @@ retorna_a_pelo_indice_coluna = function(A,indice_a){
     return(A[,indice_a%%ncol(A)])
   }
 }
+retorna_a_pelo_indice_pela_linha = function(A,indice_a){
+  if(indice_a%%nrow(A)==0){
+    return(A[nrow(A),])
+  }else{
+    return(A[indice_a%%nrow(A),])
+  }
+}
+
 
 A = matrix(c(.3,0,0,.5,.3,0,.2,.7,1),nrow=3,ncol=3)
 B = matrix(c(1,.5,0,0,.5,1),nrow=3,ncol=2)
@@ -63,11 +71,22 @@ sum(alphas)
 # 3. Cálculo da variável backward Beta .
 
 
+betas =  data.frame(1,1,1)
 
 
 
-
-
+for(i in 1:12){
+  print(retorna_a_pelo_indice_pela_linha(A,i))
+#   aux_alphas=  cbind(aux_alphas,sum(alphas[nrow(alphas),] *retorna_a_pelo_indice_coluna(A,i)) * retorna_b_pelo_indice_linha(B,i))# OK 
+#   if(i%%3 ==0){
+#     aux_alphas = data.frame(aux_alphas[,-1])
+#   }
+#   if(ncol(aux_alphas)==3){
+#     alphas = rbind(data.frame( aux_alphas[,1], aux_alphas[,2], aux_alphas[,3]))
+#     colnames(alphas) = c("alpha1","alpha2","alpha3")
+#     aux_alphas =  data.frame(1)
+#   }
+}
 
 
 
