@@ -101,6 +101,44 @@ hmm_backward = function(A,B,pi,iteracoes){
 }
 
 
+viterbi = function(A,B,pi,iteracoes){
+  # Inicialização (Equações 15a e 15b)
+  delta_atual = pi*B[,1]
+  psi = rep(0,nrow(B))
+  
+  aux_delta =  data.frame(1)
+  aux_psi =  data.frame(1)
+  delta = data.frame(delta1 = delta_atual[1,1],delta2 = delta_atual[2,1],delta3 = delta_atual[3,1])
+  psi = data.frame(psi1 = psi[1], psi2 = psi[2],psi3 = psi[3])
+  for(i in 1:iteracoes){
+    a = retorna_a_pelo_indice_coluna(A,i-1)
+    b = retorna_b_pelo_indice_linha(B,i,1)
+    
+    aux_delta = cbind(aux_delta,max(delta_atual*a)*b)
+    aux_psi = cbind(aux_psi, which.max(delta_atual*a))
+    
+    if(i%%ncol(A) ==0){
+      aux_delta = data.frame(aux_delta[,-1])
+      aux_psi = data.frame(aux_psi[,-1])
+      delta_atual = data.frame( delta1 = aux_delta[,1], delta2 = aux_delta[,2], delta3 = aux_delta[,3])
+      colnames(delta_atual) = c("delta1","delta2","delta3")
+      delta = rbind(delta,delta_atual)
+      psi = rbind(psi,data.frame( psi1 = aux_psi[,1], psi2=aux_psi[,2], psi3= aux_psi[,3]))
+      colnames(delta) = c("delta1","delta2","delta3")
+      colnames(psi) = c("psi1","psi2","psi3")
+      aux_psi =  data.frame(1)
+      aux_delta =  data.frame(1)
+    }
+  }
+  # print(delta)
+  print(psi)
+  #   Terminação (Equações 17a e 17b)
+  maximo = max(delta[nrow(delta),])
+  indice = which.max(delta[nrow(delta),])
+  return(data.frame(maximo = maximo,indice = indice))
+}
+
+
 
 A = matrix(c(.3,0,0,.5,.3,0,.2,.7,1),nrow=3,ncol=3)
 B = matrix(c(1,.5,0,0,.5,1),nrow=3,ncol=2)
@@ -109,52 +147,12 @@ pi = matrix(c(.6,.4,0),nrow=3,ncol=1)
 
 hmm_forward(A,B,pi,8)
 hmm_backward(A,B,pi,12)
+viterbi(A,B,pi,9)
 
-# algoritmo de Viterbi
 
-# Inicialização (Equações 15a e 15b)
-delta_atual = pi*B[,1]
-psi = rep(0,nrow(B))
-# 
-# delta2_1 = max(delta*A[,1])*B[1,1]
-# psi2_1 = which.max(delta*A[,1])
-# 
-# delta2_2 = max(delta*A[,2])*B[2,1]
-# psi2_2 = which.max(delta*A[,2])
-# 
-# delta2_3 = max(delta*A[,3])*B[3,1]
-# psi2_3 = which.max(delta*A[,3])
 
-iteracoes = 9
-aux_delta =  data.frame(1)
-aux_psi =  data.frame(1)
-delta = data.frame(delta1 = delta_atual[1,1],delta2 = delta_atual[2,1],delta3 = delta_atual[3,1])
-psi = data.frame()
-j = 1
-for(i in 1:iteracoes){
-#   i = 3
-  a = retorna_a_pelo_indice_coluna(A,i-1)
-  b = retorna_b_pelo_indice_linha(B,i,1)
-  
-  aux_delta = cbind(aux_delta,max(delta_atual*a)*b)
-  aux_psi = cbind(aux_psi, which.max(delta_atual*a))
-  
-  if(i%%ncol(A) ==0){
-    aux_delta = data.frame(aux_delta[,-1])
-    aux_psi = data.frame(aux_psi[,-1])
-#   }
-#   if(ncol(aux_delta)==ncol(A)){
-    delta_atual = data.frame( delta1 = aux_delta[,1], delta2 = aux_delta[,2], delta3 = aux_delta[,3])
-    colnames(delta_atual) = c("delta1","delta2","delta3")
-    delta = rbind(delta,delta_atual)
-    psi = rbind(psi,data.frame( psi1 = aux_psi[,1], psi2=aux_psi[,2], psi3= aux_psi[,3]))
-    colnames(delta) = c("delta1","delta2","delta3")
-    colnames(psi) = c("psi1","psi2","psi3")
-    aux_psi =  data.frame(1)
-    aux_delta =  data.frame(1)
-  }
-}
 
-delta
-psi
+
+
+
 
