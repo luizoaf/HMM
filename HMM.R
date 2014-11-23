@@ -130,7 +130,7 @@ viterbi = function(A,B,pi,iteracoes){
       aux_delta =  data.frame(1)
     }
   }
-  # print(delta)
+  print(delta)
   print(psi)
   #   Terminação (Equações 17a e 17b)
   maximo = max(delta[nrow(delta),])
