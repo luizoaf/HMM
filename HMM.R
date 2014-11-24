@@ -144,7 +144,6 @@ A = matrix(c(.3,0,0,.5,.3,0,.2,.7,1),nrow=3,ncol=3)
 B = matrix(c(1,.5,0,0,.5,1),nrow=3,ncol=2)
 pi = matrix(c(.6,.4,0),nrow=3,ncol=1)
 
-
 hmm_forward(A,B,pi,8)
 hmm_backward(A,B,pi,12)
 viterbi(A,B,pi,9)
