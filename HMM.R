@@ -104,12 +104,12 @@ hmm_backward = function(A,B,pi,iteracoes){
 viterbi = function(A,B,pi,iteracoes){
   # Inicialização (Equações 15a e 15b)
   delta_atual = pi*B[,1]
-  psi = rep(0,nrow(B))
+  psi = data.frame()
   
   aux_delta =  data.frame(1)
   aux_psi =  data.frame(1)
   delta = data.frame(delta1 = delta_atual[1,1],delta2 = delta_atual[2,1],delta3 = delta_atual[3,1])
-  psi = data.frame(psi1 = psi[1], psi2 = psi[2],psi3 = psi[3])
+  estados = which.max(delta_atual) # definicao do primeiro estado
   for(i in 1:iteracoes){
     a = retorna_a_pelo_indice_coluna(A,i-1)
     b = retorna_b_pelo_indice_linha(B,i,1)
@@ -130,15 +130,17 @@ viterbi = function(A,B,pi,iteracoes){
       aux_delta =  data.frame(1)
     }
   }
-  print(delta)
-  print(psi)
+  estados = c(estados,psi[-1,3]) # a forma de definir o primeiro estado eh diferente da recursao
+#   print(delta)
+#   print(psi)
+  
+  print("Backtracking")
+  print(estados)
   #   Terminação (Equações 17a e 17b)
   maximo = max(delta[nrow(delta),])
   indice = which.max(delta[nrow(delta),])
   return(data.frame(maximo = maximo,indice = indice))
 }
-
-
 
 A = matrix(c(.3,0,0,.5,.3,0,.2,.7,1),nrow=3,ncol=3)
 B = matrix(c(1,.5,0,0,.5,1),nrow=3,ncol=2)
@@ -146,7 +148,7 @@ pi = matrix(c(.6,.4,0),nrow=3,ncol=1)
 
 hmm_forward(A,B,pi,8)
 hmm_backward(A,B,pi,12)
-viterbi(A,B,pi,9)
+viterbi(A,B,pi,12)
 
 
 
